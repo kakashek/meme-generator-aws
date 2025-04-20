@@ -1,0 +1,185 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Import or create Cognito, S3, DynamoDB, and Parameter Store resources
+
+Parameters:
+  ProjectPrefix:
+    Type: String
+    Description: Prefix for resource names
+    Default: "meme-generator"
+  UserPoolId:
+    Type: String
+    Description: Existing Cognito User Pool ID
+  ClientId:
+    Type: String
+    Description: Cognito Client ID
+  ClientSecret:
+    Type: String
+    Description: Cognito Client Secret
+  HostedZoneName:
+    Type: String
+    Description: Route 53 Hosted Zone Name
+    Default: "example.com."
+
+Resources:
+# Cognito User Pool
+  CognitoUserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: !Sub "${ProjectPrefix}-cognito"
+      MfaConfiguration: "OPTIONAL"  
+      AutoVerifiedAttributes:
+        - "email"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: true
+      UsernameAttributes:
+        - email
+    DeletionPolicy: Retain  
+
+  # Cognito User Pool Client with Google as a federated identity provider
+  CognitoUserPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      ClientName: "meme-generator-app"
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+      CallbackURLs:
+        - "https://localhost:3000/callback"
+        - !Sub "https://${ProjectPrefix}.auth.ap-southeast-2.amazoncognito.com/oauth2/idpresponse"  
+      LogoutURLs:
+        - "https://my-app.com/logout"    
+      SupportedIdentityProviders:
+        - "COGNITO"
+        - "Google" 
+
+  CognitoUserPoolDomain:
+    Type: "AWS::Cognito::UserPoolDomain"
+    Properties:
+      Domain: !Sub "${ProjectPrefix}.auth.ap-southeast-2.amazoncognito.com" 
+      UserPoolId: !Ref CognitoUserPool  
+
+  # S3 Bucket 
+  MyS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub "${ProjectPrefix}-bucket"
+      LifecycleConfiguration:
+        Rules:
+          - Id: "DeleteOldFiles"
+            Status: "Enabled"
+            ExpirationInDays: 1
+            Prefix: "temp/"  
+    DeletionPolicy: Retain
+
+  # DynamoDB table
+  MemeTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: !Sub "${ProjectPrefix}-images"
+      AttributeDefinitions:
+        - AttributeName: "memeId"
+          AttributeType: "S"
+        - AttributeName: "memeCreator"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "memeCreator"
+          KeyType: "HASH"
+        - AttributeName: "memeId"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+    DeletionPolicy: Retain  
+
+  # Parameter Store
+  CognitoClientIdParameter:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "/${ProjectPrefix}/cognito_client_id"
+      Type: "String"
+      Value: !Ref ClientId
+      Description: "Cognito Client ID"
+      Tier: Standard
+    DeletionPolicy: Retain
+
+  CognitoDomainParameter:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "/${ProjectPrefix}/cognito_domain"
+      Type: "String"
+      Value: !Sub "${ProjectPrefix}.auth.ap-southeast-2.amazoncognito.com" 
+      Description: "Cognito domain"
+      Tier: Standard
+    DeletionPolicy: Retain
+
+  CognitoUserPoolIdParameter:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "/${ProjectPrefix}/user_pool_id"
+      Type: "String"
+      Value: !Ref UserPoolId
+      Description: "Cognito User Pool ID"
+      Tier: Standard
+    DeletionPolicy: Retain
+
+  CognitoClientSecretParameter:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "/${ProjectPrefix}/client_secret"
+      Type: "String"
+      Value: !Ref ClientSecret
+      Description: "Cognito Client Secret"
+      Tier: Standard
+    DeletionPolicy: Retain
+    
+  # Route 53 CNAME Record for Cognito Custom Domain
+  Route53CognitoDomain:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      HostedZoneName: !Ref HostedZoneName
+      Name: !Sub "${ProjectPrefix}.${HostedZoneName}" 
+      Type: "CNAME"
+      TTL: "300"
+
+Outputs:
+  CognitoUserPoolId:
+    Description: "The ID of the Cognito User Pool"
+    Value: !Ref CognitoUserPool
+
+  S3BucketName:
+    Description: "Name of the S3 bucket for memes"
+    Value: !Ref MyS3Bucket
+
+  DynamoDBTableName:
+    Description: "Name of the DynamoDB table for meme metadata"
+    Value: !Ref MemeTable
+
+  CognitoClientId:
+    Description: "The Cognito Client ID"
+    Value: !Ref CognitoClientIdParameter
+
+  CognitoDomain:
+    Description: "The Cognito Domain"
+    Value: !Ref CognitoDomainParameter
+
+  CognitoUserPoolIdParameter:
+    Description: "Cognito User Pool ID stored in Parameter Store"
+    Value: !Ref CognitoUserPoolIdParameter
+
+  CognitoClientSecret:
+    Description: "Cognito Client Secret stored in Parameter Store"
+    Value: !Ref CognitoClientSecretParameter
+
+  CognitoUserPoolDomain:
+    Description: "Cognito custom domain"
+    Value: !Sub "${ProjectPrefix}.${HostedZoneName}"

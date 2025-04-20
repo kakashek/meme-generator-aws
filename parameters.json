@@ -1,0 +1,9 @@
+{
+    "Parameters": {
+        "ProjectPrefix": "meme-generator",
+        "UserPoolId": "YOUR_USER_POOL_ID",
+        "ClientId": "YOUR_CLIENT_ID",
+        "ClientSecret": "YOUR_CLIENT_SECRET",
+        "HostedZoneName": "YOUR_DOMAIN.com."
+    }
+} 
