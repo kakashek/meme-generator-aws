@@ -30,7 +30,7 @@ This project is a full-stack meme generator web application deployed on AWS, all
 - **Runtime**: Node.js
 - **Framework**: AWS SDK for JavaScript
 - **Testing**: Load testing scripts
-- **Authentication**: JWT tokens, AWS Cognito (Google OAuth, Email Verification)
+- **Authentication**: JWT tokens, AWS Cognito
 - **Image Processing**: Sharp library
 
 ## AWS Infrastructure
