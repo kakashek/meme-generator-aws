@@ -1,4 +1,5 @@
-# Meme Generator on AWS
+# Meme Generator Platform (AWS Full-Stack Project)
+
 This project is a full-stack meme generator web application deployed on AWS, allowing users to create, store, and manage custom memes. The platform supports both static and dynamic meme generation, user authentication, and personalized meme libraries, while including an admin dashboard formanaging user generation.
 
 ## Features
