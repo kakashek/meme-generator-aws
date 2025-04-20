@@ -24,14 +24,16 @@ This project is a full-stack meme generator web application deployed on AWS, all
 - **Concurrent Request Handling**: Testing function behavior under various load conditions
 
 
-### Core Technologies
+## Core Technologies
+
 - **Runtime**: Node.js
 - **Framework**: AWS SDK for JavaScript
 - **Testing**: Load testing scripts
 - **Authentication**: JWT tokens, AWS Cognito (Google OAuth, Email Verification)
 - **Image Processing**: Sharp library
 
-### AWS Infrastructure
+## AWS Infrastructure
+
 - **Infrastructure as Code (IaC)**:
   - CloudFormation (for infrastructure deployment)
 - **Servers**:
