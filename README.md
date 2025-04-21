@@ -111,6 +111,9 @@ This will execute various test scenarios:
 - Bulk image processing
 - High-frequency API calls
 
+## License
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+
 ## Author
 - Ka Long Arnald Shek
 
