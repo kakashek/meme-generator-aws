@@ -47,6 +47,7 @@ This project is a full-stack meme generator web application deployed on AWS, all
   - S3 (for image storage)
   - DynamoDB (for metadata storage)
   - ElastiCache (for Memcached caching)
+  - EFS (for static assets storage)
 - **Messaging**: 
   - SQS (for asynchronous processing)
 - **Configuration**: 
