@@ -61,6 +61,8 @@ This project is a full-stack meme generator web application deployed on AWS, all
 - **Networking**:
   - VPC (for internal port routing)
   - Route 53 (for DNS management)
+    
+  <img width="468" alt="image" src="https://github.com/user-attachments/assets/5a7ff0fb-ddda-4950-bf98-a2f565a6410b" />
 
 ## Prerequisites
 
