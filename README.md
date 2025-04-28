@@ -1,4 +1,4 @@
-# Meme Generator Platform (AWS Full-Stack Project)
+# Meme Generator Web Application (AWS Full-Stack Project)
 
 This project is a full-stack meme generator web application deployed on AWS, allowing users to create, store, and manage custom memes. The platform supports both static and dynamic meme generation, user authentication, and personalized meme libraries, while including an admin dashboard formanaging user generation.
 
@@ -28,7 +28,8 @@ This project is a full-stack meme generator web application deployed on AWS, all
 ## Core Technologies
 
 - **Runtime**: Node.js
-- **Framework**: AWS SDK for JavaScript
+- **Web Framework**: Express.js
+- **AWS SDK**: For interacting with AWS services
 - **Testing**: Load testing scripts
 - **Authentication**: JWT tokens, AWS Cognito
 - **Image Processing**: Sharp library
